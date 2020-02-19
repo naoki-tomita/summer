@@ -432,10 +432,10 @@ source-map@^0.6.0:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
 
-summer-framework@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/summer-framework/-/summer-framework-0.0.3.tgz#e816e1868406368e2dee93d1f3c39ed3146129b8"
-  integrity sha512-+3PJa7jvbEJvs8POPRkw5JZRmxyl5Js6uW+IGKYp4u8JKL/uBLjh7BZrrCx4wMSbYlcMwmCyclDFeS5RBImILQ==
+summer-framework@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/summer-framework/-/summer-framework-0.0.6.tgz#2d872b831d4a60dc3d9a34bfa08f24929ca3b52c"
+  integrity sha512-p0S+WSwQxP8SUj2o6RGx8rSr0rFb5cjtZ/F19Vn3bae+ImYGrM98NgSxW1I+bCs/aXOiRLcUruC8OLh/BCV7Dw==
   dependencies:
     "@types/express" "^4.17.2"
     express "^4.17.1"
