@@ -10,7 +10,7 @@
     "typescript": "^3.7.5"
   },
   "scripts": {
-    "prepublish": "npm run build",
+    "prepublish": "yarn build",
     "build": "tsc"
   }
 }
