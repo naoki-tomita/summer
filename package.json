@@ -1,9 +1,9 @@
 {
   "name": "summer-framework",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "index.js",
   "license": "MIT",
-  "type": "",
+  "type": "index.d.ts",
   "dependencies": {
     "@types/express": "^4.17.2",
     "express": "^4.17.1",
