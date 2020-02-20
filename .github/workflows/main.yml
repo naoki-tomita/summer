@@ -11,5 +11,5 @@ jobs:
         key: e2e-app-node_modules-${{ hashFiles('**/yarn.lock') }}
     - uses: actions/setup-node@master
       with:
-        version: 12
+        node-version: 12
     - run: yarn && yarn test
