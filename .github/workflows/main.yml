@@ -8,7 +8,7 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: e2e/app/node_modules
-        key: e2e-app-node_modules-${{ hashFiles('e2e/app/yarn.lock') }}
+        key: e2e-app-node_modules-${{ hashFiles('**/yarn.lock') }}
     - uses: actions/setup-node@master
       with:
         version: 12
