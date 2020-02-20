@@ -2,8 +2,13 @@ name: test
 on: [push]
 jobs:
   test:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - uses: actions/cache@v1
+      with:
+        path: e2e/app/node_modules
+        key: e2e-app-node_modules-${{ hashFiles('e2e/app/yarn.lock') }}
     - uses: actions/setup-node@master
       with:
         version: 12
