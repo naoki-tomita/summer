@@ -1,3 +1,5 @@
+![test](https://github.com/naoki-tomita/summer/workflows/test/badge.svg)
+
 # summer-framework
 
 A web framework like spring framework.
