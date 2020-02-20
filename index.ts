@@ -8,26 +8,40 @@ const targets = new Set<{
   __meta__: { [key: string]: { method: "get" | "post" | "put", path: string } }
 }>();
 
+const targetMap = new Map<any, {
+  Class: Function;
+  root: string;
+  resources: {
+    [key: string]: {
+      method: "get" | "post" | "put";
+      path: string;
+    };
+  };
+}>()
+
 export const root: (path: string) => ClassDecorator = function(path) {
-  return function(target: any) {
-    target.prototype.__root__ = path;
-    return target;
+  return function(TargetClass) {
+    const targetData = targetMap.get(TargetClass.prototype) || { Class: undefined, root: path, resources: {} } as any;
+    targetData.class = TargetClass;
+    targetData.root = path;
+    targetMap.set(TargetClass.prototype, targetData);
+    return TargetClass;
   }
 }
 
 export const path: (path: string) => MethodDecorator = function(path) {
   return function(target: any, key) {
-    const meta = { ...(target.__meta__ || {})[key] || {}, path };
-    target.__meta__ = { ...target.__meta__ || {}, [key]: meta };
-    targets.add(target);
+    const targetData = targetMap.get(target) || { Class: undefined, root: "", resources: {} } as any;
+    targetData.resources[key] = { ...targetData.resources[key], path };
+    targetMap.set(target, targetData);
     return target;
   }
 }
 
-function method(target: any, key: string | symbol, type: string) {
-  const meta = { ...(target.__meta__ || {})[key] || {}, method: type };
-  target.__meta__ = { ...target.__meta__ || {}, [key]: meta };
-  targets.add(target);
+function method(target: any, key: any, type: string) {
+  const targetData = targetMap.get(target) || { Class: undefined, root: "", resources: {} } as any;
+  targetData.resources[key] = { ...targetData.resources[key], method: type };
+  targetMap.set(target, targetData);
   return target;
 }
 
@@ -51,11 +65,10 @@ export const customMethod: (type: string) => MethodDecorator = function(type: st
 
 export function listen(port: number) {
   app.use(express.json());
-  targets.forEach((target) => {
-    const meta = target.__meta__;
-    const root = target.__root__ || "";
-    Object.keys(meta).forEach(key => {
-      const { method = "get", path } = meta[key];
+  [...targetMap.entries()].forEach(([target, meta]) => {
+    const { resources, root = "" } = meta;
+    Object.keys(resources).forEach(key => {
+      const { method = "get", path } = resources[key];
       const fullPath = root + path;
       debug(`${fullPath}: ${(method).toUpperCase()}`)
       app[method](fullPath, async (req, res) => {

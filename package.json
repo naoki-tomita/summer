@@ -11,6 +11,11 @@
   },
   "scripts": {
     "prepublish": "yarn build",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "yarn build && npx ts-node ./__tests__/index.spec.ts"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.5.4",
+    "node-fetch": "^2.6.0"
   }
 }
