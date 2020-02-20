@@ -88,7 +88,7 @@ export function listen(port: number) {
             return res.status(500).json({});
           }
           const [_,{ target, key }] = found;
-          const { status, body } = target[key](e);
+          const { status, body } = await target[key](e);
           res.status(status).json(body);
         }
       });

@@ -8,7 +8,7 @@ A web framework like spring framework.
 # how to use
 
 ```ts
-import { listen, get, path, post, root } from "summer-framework";
+import { listen, get, path, post, root, handle } from "summer-framework";
 
 @root("/root")
 class FooBarResource {
@@ -35,6 +35,10 @@ class FooBarResource {
     return body;
   }
 
+  @handle(MyException)
+  async handleMyException(error: MyException): { status: number, body: any } {
+    return { status: 404, body: { error: "this is my exception." } }
+  }
 }
 
 launch(8000);
