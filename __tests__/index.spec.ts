@@ -1,6 +1,6 @@
-import { path, root, get, listen, post } from "..";
+import { path, root, get, listen, post, close } from "..";
 import fetch from "node-fetch";
-import { deepStrictEqual, fail } from "assert";
+import { deepStrictEqual } from "assert";
 
 function sleep(ms: number) {
   return new Promise(ok => setTimeout(ok, ms));
@@ -129,11 +129,17 @@ function toQueryString(obj: any) {
   return result === "" ? "" : `?${result}`;
 }
 
-async function main() {
-  await polling();
+describe("summer-framework test", () => {
+  beforeAll(async () => {
+    await polling();
+  });
 
-  try {
-    for (const { status, path, method, body, query, response } of tests) {
+  afterAll(() => {
+    close();
+  });
+
+  tests.forEach(({ status, path, method, body, query, response }) => {
+    it("should response", async () => {
       const result = await fetch(
         `http://localhost:${port}${path}${toQueryString(query)}`,
         {
@@ -151,13 +157,6 @@ async function main() {
         await result.json(),
         "Response body are not equal."
       );
-    }
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  }
-
-  process.exit(0);
-}
-
-main();
+    });
+  });
+});

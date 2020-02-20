@@ -1,16 +1,6 @@
 import express from "express";
 
 const app = express();
-const targets = new Set<
-  {
-    [key: string]: (...args: any[]) => any;
-  } & {
-    __root__: string;
-    __meta__: {
-      [key: string]: { method: "get" | "post" | "put"; path: string };
-    };
-  }
->();
 
 const targetMap = new Map<
   any,
@@ -78,6 +68,8 @@ export const customMethod: (type: string) => MethodDecorator = function(
   };
 };
 
+let server: any;
+
 export function listen(port: number) {
   app.use(express.json());
   [...targetMap.entries()].forEach(([target, meta]) => {
@@ -100,7 +92,11 @@ export function listen(port: number) {
     });
   });
 
-  app.listen(port);
+  server = app.listen(port);
+}
+
+export function close() {
+  (server as any).close();
 }
 
 function logFormat(type: string, text: string) {
