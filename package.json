@@ -12,7 +12,8 @@
   "scripts": {
     "prepublish": "yarn build",
     "build": "tsc",
-    "test": "yarn build && npx ts-node ./__tests__/index.spec.ts"
+    "test": "yarn build && npx ts-node ./__tests__/index.spec.ts",
+    "lint": "npx prettier --write '{**,.}/*.ts'"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.4",
