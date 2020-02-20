@@ -48,25 +48,22 @@ function method(target: any, key: any, type: string) {
   return target;
 }
 
-export const get: MethodDecorator = function(target: any, key) {
-  return method(target, key, "get");
-};
+const errorHandlerMap = new Map<any, { target: any, key: any }>();
+export const handle: (error: any) => MethodDecorator = error => {
+  return function(target, key) {
+    errorHandlerMap.set(error, { target, key });
+  }
+}
 
-export const post: MethodDecorator = function(target: any, key) {
-  return method(target, key, "post");
-};
-
-export const put: MethodDecorator = function(target: any, key) {
-  return method(target, key, "put");
-};
-
-export const customMethod: (type: string) => MethodDecorator = function(
+export const get: MethodDecorator = (target: any, key) =>
+  method(target, key, "get");
+export const post: MethodDecorator = (target: any, key) =>
+  method(target, key, "post");
+export const put: MethodDecorator = (target: any, key) =>
+  method(target, key, "put");
+export const customMethod: (type: string) => MethodDecorator = (
   type: string
-) {
-  return function(target: any, key) {
-    return method(target, key, type);
-  };
-};
+) => (target: any, key) => method(target, key, type);
 
 let server: any;
 
@@ -86,7 +83,13 @@ export function listen(port: number) {
           res.json(result);
         } catch (e) {
           error(e.stack);
-          res.status(500).json({});
+          const found = [...errorHandlerMap.entries()].find(([key]) => e instanceof key);
+          if (found == null) {
+            return res.status(500).json({});
+          }
+          const [_,{ target, key }] = found;
+          const { status, body } = target[key](e);
+          res.status(status).json(body);
         }
       });
     });

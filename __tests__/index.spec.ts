@@ -1,4 +1,4 @@
-import { path, root, get, listen, post, close } from "..";
+import { path, root, get, listen, post, close, handle } from "..";
 import fetch from "node-fetch";
 import { deepStrictEqual } from "assert";
 
@@ -42,6 +42,12 @@ class Test {
   async fun5() {
     throw Error("an error occured.");
   }
+
+  @path("/myerror")
+  @get
+  async fun6() {
+    throw new MyError("MyError");
+  }
 }
 
 class System {
@@ -50,6 +56,16 @@ class System {
   async method() {
     await sleep(2000);
     return { wait: 2000 };
+  }
+}
+
+class MyError extends Error {}
+
+class ErrorHandler {
+  @handle(MyError)
+  handler(error: MyError) {
+    console.log(error);
+    return { status: 400, body: { hello: "world" } };
   }
 }
 
@@ -119,7 +135,16 @@ const tests = [
     query: {},
     status: 500,
     response: {}
-  }
+  },
+  // original error handler test
+  {
+    path: "/root/myerror",
+    method: "get",
+    body: {},
+    query: {},
+    status: 400,
+    response: { hello: "world" }
+  },
 ];
 
 function toQueryString(obj: any) {
@@ -139,7 +164,7 @@ describe("summer-framework test", () => {
   });
 
   tests.forEach(({ status, path, method, body, query, response }) => {
-    it("should response", async () => {
+    it(`should response ${JSON.stringify(response)}`, async () => {
       const result = await fetch(
         `http://localhost:${port}${path}${toQueryString(query)}`,
         {

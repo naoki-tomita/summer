@@ -12,6 +12,7 @@
     "prepublish": "yarn build",
     "build": "tsc",
     "test": "yarn build && jest --silent=true --verbose true",
+    "test:verbose": "yarn build && jest",
     "lint": "npx prettier --write '{**,.}/*.ts'"
   },
   "devDependencies": {
