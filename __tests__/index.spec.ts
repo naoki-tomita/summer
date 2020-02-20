@@ -72,7 +72,6 @@ class ErrorHandler {
 const port = Math.floor(Math.random() * 30000 + 30000);
 listen(port);
 
-///////////////////////////////////////////////////////////// test
 function polling() {
   return new Promise(async ok => {
     for (let i = 0; i < 30; i++) {
