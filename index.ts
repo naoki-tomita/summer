@@ -55,15 +55,11 @@ export const handle: (error: any) => MethodDecorator = error => {
   }
 }
 
-export const get: MethodDecorator = (target: any, key) =>
-  method(target, key, "get");
-export const post: MethodDecorator = (target: any, key) =>
-  method(target, key, "post");
-export const put: MethodDecorator = (target: any, key) =>
-  method(target, key, "put");
-export const customMethod: (type: string) => MethodDecorator = (
-  type: string
-) => (target: any, key) => method(target, key, type);
+export const get: MethodDecorator = (target: any, key) => method(target, key, "get");
+export const post: MethodDecorator = (target: any, key) => method(target, key, "post");
+export const put: MethodDecorator = (target: any, key) => method(target, key, "put");
+export const customMethod: (type: string) => MethodDecorator =
+  (type: string) => (target: any, key) => method(target, key, type);
 
 let server: any;
 
