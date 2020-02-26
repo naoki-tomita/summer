@@ -1,4 +1,4 @@
-import { path, root, get, listen, post, close, handle, auth } from "..";
+import { path, root, get, listen, post, close, handle, auth, Response } from "..";
 import fetch from "node-fetch";
 import { deepStrictEqual } from "assert";
 
@@ -59,6 +59,11 @@ class Test {
   async auth(cookies: any) {
     console.log(cookies);
     return { name: cookies.user };
+  }
+
+  @path("/response")
+  async setHeader() {
+    return new Response().status(302).headers({ "set-cookie": "foo=bar" }).body({ hello: "world" });
   }
 }
 
@@ -175,7 +180,7 @@ const tests: Array<{
         name: "tomita"
       }
     }
-  }
+  },
 ];
 
 function toQueryString(obj: any) {
@@ -218,4 +223,24 @@ describe("summer-framework test", () => {
       );
     });
   });
+
+  it("should parese Response object",async () => {
+    // parse Response object.
+    const { path, method, status, response } = {
+      path: "/root/response",
+      method: "get",
+      status: 302,
+      response: {
+        hello: "world"
+      },
+    }
+
+    const result = await fetch(`http://localhost:${port}${path}`);
+    deepStrictEqual(status, result.status, "Status code are not equal.");
+    deepStrictEqual(
+      response,
+      await result.json(),
+      "Response body are not equal."
+    );
+  })
 });

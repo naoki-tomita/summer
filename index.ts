@@ -80,11 +80,14 @@ export function listen(port: number) {
       app[method](fullPath, async (req, res) => {
         const { params, body, query, headers, cookies } = req;
         debug(`${req.url}`);
-        console.log(params, body, query, headers, cookies)
         try {
           const authResult = authHandler && await (authHandler.target[authHandler.key](cookies));
-          const result = await target[key](params, query, body, { headers, authResult });
-          res.json(result);
+          const result: any = await target[key](params, query, body, { headers, authResult });
+          if (result instanceof Response) {
+            res.status(result._status).header(result._headers).json(result._body);
+          } else {
+            res.status(200).header({}).json(result);
+          }
         } catch (e) {
           error(e.stack);
           const found = [...errorHandlerMap.entries()].find(([key]) => e instanceof key);
@@ -121,4 +124,26 @@ function error(text: string) {
 
 function warn(text: string) {
   console.warn(logFormat("warn ", text));
+}
+
+
+export class Response {
+  _status: number = 200;
+  _body: any = {};
+  _headers: any = {};
+
+  status(status: number) {
+    this._status = status;
+    return this;
+  }
+
+  body(json: any) {
+    this._body = json;
+    return this;
+  }
+
+  headers(headers: any) {
+    this._headers = headers;
+    return this;
+  }
 }
