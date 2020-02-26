@@ -1,4 +1,5 @@
 import express from "express";
+import parser from "cookie-parser";
 
 const app = express();
 
@@ -61,10 +62,15 @@ export const put: MethodDecorator = (target: any, key) => method(target, key, "p
 export const customMethod: (type: string) => MethodDecorator =
   (type: string) => (target: any, key) => method(target, key, type);
 
-let server: any;
+let authHandler: { target: any, key: string | symbol } | undefined;
+export const auth: MethodDecorator = function(target: any, key) {
+  authHandler = { target, key };
+}
 
+let server: any;
 export function listen(port: number) {
   app.use(express.json());
+  app.use(parser());
   [...targetMap.entries()].forEach(([target, meta]) => {
     const { resources, root = "" } = meta;
     Object.keys(resources).forEach(key => {
@@ -72,10 +78,12 @@ export function listen(port: number) {
       const fullPath = root + path;
       debug(`${fullPath}: ${method.toUpperCase()}`);
       app[method](fullPath, async (req, res) => {
+        const { params, body, query, headers, cookies } = req;
         debug(`${req.url}`);
-        const { params, body, query, headers } = req;
+        console.log(params, body, query, headers, cookies)
         try {
-          const result = await target[key](params, query, body, headers);
+          const authResult = authHandler && await (authHandler.target[authHandler.key](cookies));
+          const result = await target[key](params, query, body, { headers, authResult });
           res.json(result);
         } catch (e) {
           error(e.stack);

@@ -1,4 +1,4 @@
-import { path, root, get, listen, post, close, handle } from "..";
+import { path, root, get, listen, post, close, handle, auth } from "..";
 import fetch from "node-fetch";
 import { deepStrictEqual } from "assert";
 
@@ -53,6 +53,12 @@ class Test {
   @get
   async fun7(a: {}, b: {}, c: {}, headers: {}) {
     return headers;
+  }
+
+  @auth
+  async auth(cookies: any) {
+    console.log(cookies);
+    return { name: cookies.user };
   }
 }
 
@@ -153,16 +159,22 @@ const tests: Array<{
   {
     path: "/root/headers",
     method: "get",
-    headers: { foo: "bar" },
+    headers: { foo: "bar", cookie: "user=tomita" },
     status: 200,
     response: {
-      "accept": "*/*",
-      "accept-encoding": "gzip,deflate",
-      "connection": "close",
-      "foo": "bar",
-      "host": `localhost:${port}`,
-      "user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
-     }
+      headers: {
+        "accept": "*/*",
+        "accept-encoding": "gzip,deflate",
+        "connection": "close",
+        "foo": "bar",
+        "cookie": "user=tomita",
+        "host": `localhost:${port}`,
+        "user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
+      },
+      authResult: {
+        name: "tomita"
+      }
+    }
   }
 ];
 
