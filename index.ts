@@ -73,9 +73,9 @@ export function listen(port: number) {
       debug(`${fullPath}: ${method.toUpperCase()}`);
       app[method](fullPath, async (req, res) => {
         debug(`${req.url}`);
-        const { params, body, query } = req;
+        const { params, body, query, headers } = req;
         try {
-          const result = await target[key](params, query, body);
+          const result = await target[key](params, query, body, headers);
           res.json(result);
         } catch (e) {
           error(e.stack);

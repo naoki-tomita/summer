@@ -48,6 +48,12 @@ class Test {
   async fun6() {
     throw new MyError("MyError");
   }
+
+  @path("/headers")
+  @get
+  async fun7(a: {}, b: {}, c: {}, headers: {}) {
+    return headers;
+  }
 }
 
 class System {
@@ -84,13 +90,19 @@ function polling() {
   });
 }
 
-const tests = [
+const tests: Array<{
+  path: string;
+  method: "get" | "post" | "put";
+  body?: any;
+  query?: any;
+  headers?: any;
+  status: number;
+  response: any;
+}> = [
   // async test.
   {
     path: "/root/path",
     method: "get",
-    body: {},
-    query: {},
     status: 200,
     response: { wait: 2000 }
   },
@@ -98,8 +110,6 @@ const tests = [
   {
     path: "/root/path/592",
     method: "get",
-    body: {},
-    query: {},
     status: 200,
     response: { id: "592" }
   },
@@ -107,7 +117,6 @@ const tests = [
   {
     path: "/root/path2",
     method: "get",
-    body: {},
     query: { query1: "foo", query2: "bar" },
     status: 200,
     response: { query1: "foo", query2: "bar" }
@@ -130,8 +139,6 @@ const tests = [
   {
     path: "/root/error",
     method: "get",
-    body: {},
-    query: {},
     status: 500,
     response: {}
   },
@@ -139,11 +146,24 @@ const tests = [
   {
     path: "/root/myerror",
     method: "get",
-    body: {},
-    query: {},
     status: 400,
     response: { hello: "world" }
   },
+  // request header response test.
+  {
+    path: "/root/headers",
+    method: "get",
+    headers: { foo: "bar" },
+    status: 200,
+    response: {
+      "accept": "*/*",
+      "accept-encoding": "gzip,deflate",
+      "connection": "close",
+      "foo": "bar",
+      "host": `localhost:${port}`,
+      "user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
+     }
+  }
 ];
 
 function toQueryString(obj: any) {
@@ -162,17 +182,20 @@ describe("summer-framework test", () => {
     close();
   });
 
-  tests.forEach(({ status, path, method, body, query, response }) => {
+  tests.forEach(({ status, path, method, body, query, response, headers }) => {
     it(`should response ${JSON.stringify(response)}`, async () => {
       const result = await fetch(
-        `http://localhost:${port}${path}${toQueryString(query)}`,
+        `http://localhost:${port}${path}${toQueryString(query || {})}`,
         {
           method,
-          headers:
-            method === "post"
+          headers: {
+            ...(headers || {}),
+            ...(method === "post"
               ? { "content-type": "application/json" }
-              : undefined,
-          body: method === "post" ? JSON.stringify(body) : undefined
+              : {}
+            ),
+          },
+          body: method === "post" ? JSON.stringify(body || {}) : undefined
         }
       );
       deepStrictEqual(status, result.status, "Status code are not equal.");
