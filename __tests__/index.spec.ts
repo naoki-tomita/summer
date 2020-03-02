@@ -226,9 +226,8 @@ describe("summer-framework test", () => {
 
   it("should parese Response object",async () => {
     // parse Response object.
-    const { path, method, status, response } = {
+    const { path, status, response } = {
       path: "/root/response",
-      method: "get",
       status: 302,
       response: {
         hello: "world"
