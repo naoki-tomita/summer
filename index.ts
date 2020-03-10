@@ -89,14 +89,22 @@ export function listen(port: number) {
             res.status(200).header({}).json(result);
           }
         } catch (e) {
-          error(e.stack);
-          const found = [...errorHandlerMap.entries()].find(([key]) => e instanceof key);
-          if (found == null) {
-            return res.status(500).json({});
+          try {
+            error(e.stack);
+            const found = [...errorHandlerMap.entries()].find(([key]) => e instanceof key);
+            if (found == null) {
+              return res.status(500).json({});
+            }
+            const [_,{ target, key }] = found;
+            const result = await target[key](e);
+            if (result instanceof Response) {
+              res.status(result._status).json(result._body);
+            } else {
+              res.status(result.status).json(result.body);
+            }
+          } catch (e) {
+            res.status(500).json({});
           }
-          const [_,{ target, key }] = found;
-          const { status, body } = await target[key](e);
-          res.status(status).json(body);
         }
       });
     });

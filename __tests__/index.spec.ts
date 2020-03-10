@@ -49,6 +49,12 @@ class Test {
     throw new MyError("MyError");
   }
 
+  @path("/myerror2")
+  @get
+  async fun62() {
+    throw new MyError2("MyError");
+  }
+
   @path("/headers")
   @get
   async fun7(a: {}, b: {}, c: {}, headers: {}) {
@@ -77,12 +83,27 @@ class System {
 }
 
 class MyError extends Error {}
+class MyError2 implements Error {
+  name: string = "MyError2";
+  message: string;
+  stack?: string | undefined;
+  constructor(message: string = "") {
+    this.message = message;
+    Error.captureStackTrace(this);
+  }
+}
 
 class ErrorHandler {
   @handle(MyError)
   handler(error: MyError) {
     console.log(error);
     return { status: 400, body: { hello: "world" } };
+  }
+
+  @handle(MyError2)
+  handler2(error: MyError2) {
+    console.log(error);
+    return new Response().status(403).headers({ foo: "bar" }).body({ error: "error" });
   }
 }
 
@@ -160,6 +181,13 @@ const tests: Array<{
     status: 400,
     response: { hello: "world" }
   },
+  // original error handler test
+  {
+    path: "/root/myerror2",
+    method: "get",
+    status: 403,
+    response: { error: "error" }
+  },
   // request header response test.
   {
     path: "/root/headers",
@@ -224,7 +252,7 @@ describe("summer-framework test", () => {
     });
   });
 
-  it("should parese Response object",async () => {
+  it("should parese Response object", async () => {
     // parse Response object.
     const { path, status, response } = {
       path: "/root/response",
