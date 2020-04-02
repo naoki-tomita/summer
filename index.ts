@@ -67,6 +67,19 @@ export const auth: MethodDecorator = function(target: any, key) {
   authHandler = { target, key };
 }
 
+export interface Request<
+  PathParam = any,
+  QueryParam = any,
+  Body = any,
+  AuthResult = any
+> {
+  params: PathParam;
+  query: QueryParam;
+  body: Body;
+  headers: {[key: string]: string};
+  authResult: AuthResult;
+}
+
 let server: any;
 export function listen(port: number) {
   app.use(express.json());
@@ -82,7 +95,7 @@ export function listen(port: number) {
         debug(`${req.url}`);
         try {
           const authResult = authHandler && await (authHandler.target[authHandler.key](cookies));
-          const result: any = await target[key](params, query, body, { headers, authResult });
+          const result: any = await target[key]({ params, query, body, headers, authResult });
           if (result instanceof Response) {
             res.status(result._status).header(result._headers).json(result._body);
           } else {
