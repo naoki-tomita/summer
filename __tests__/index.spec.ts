@@ -1,4 +1,4 @@
-import { path, root, get, listen, post, close, handle, auth, Response } from "..";
+import { path, root, get, listen, post, close, handle, auth, Response, Request } from "..";
 import fetch from "node-fetch";
 import { deepStrictEqual } from "assert";
 
@@ -17,22 +17,20 @@ class Test {
 
   @path("/path/:id")
   @get
-  async fun2({ id }: { id: string }) {
+  async fun2({ params: { id } }: Request<{ id: string }>) {
     return { id };
   }
 
   @path("/path2")
   @get
-  async fun3(_: any, query: any) {
+  async fun3({ query }: Request) {
     return { ...query };
   }
 
   @path("/path3/:name/:age")
   @post
   async fun4(
-    { name, age }: { name: string; age: string },
-    query: any,
-    body: any
+    { params: {name, age}, query, body }: Request<{ name: string; age: string }>
   ) {
     return { name, age, query, body };
   }
@@ -57,7 +55,7 @@ class Test {
 
   @path("/headers")
   @get
-  async fun7(a: {}, b: {}, c: {}, headers: {}) {
+  async fun7({ headers }: Request) {
     return headers;
   }
 
@@ -195,18 +193,13 @@ const tests: Array<{
     headers: { foo: "bar", cookie: "user=tomita" },
     status: 200,
     response: {
-      headers: {
-        "accept": "*/*",
-        "accept-encoding": "gzip,deflate",
-        "connection": "close",
-        "foo": "bar",
-        "cookie": "user=tomita",
-        "host": `localhost:${port}`,
-        "user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
-      },
-      authResult: {
-        name: "tomita"
-      }
+      "accept": "*/*",
+      "accept-encoding": "gzip,deflate",
+      "connection": "close",
+      "foo": "bar",
+      "cookie": "user=tomita",
+      "host": `localhost:${port}`,
+      "user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
     }
   },
 ];
@@ -243,10 +236,10 @@ describe("summer-framework test", () => {
           body: method === "post" ? JSON.stringify(body || {}) : undefined
         }
       );
-      deepStrictEqual(status, result.status, "Status code are not equal.");
+      deepStrictEqual(result.status, status, "Status code are not equal.");
       deepStrictEqual(
-        response,
         await result.json(),
+        response,
         "Response body are not equal."
       );
     });
