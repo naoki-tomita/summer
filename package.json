@@ -1,13 +1,14 @@
 {
   "name": "summer-framework",
   "version": "0.2.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT",
   "type": "index.d.ts",
   "dependencies": {
   },
   "scripts": {
     "prepublish": "yarn build",
+    "prebuild": "rm -rf dist",
     "build": "tsc",
     "test": "yarn build && jest --silent=true --verbose true",
     "test:verbose": "yarn build && jest",
