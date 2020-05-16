@@ -5,10 +5,6 @@
   "license": "MIT",
   "type": "index.d.ts",
   "dependencies": {
-    "@types/cookie-parser": "^1.4.2",
-    "@types/express": "^4.17.2",
-    "cookie-parser": "^1.4.4",
-    "express": "^4.17.1"
   },
   "scripts": {
     "prepublish": "yarn build",
@@ -23,7 +19,7 @@
     "jest": "^25.1.0",
     "node-fetch": "^2.6.0",
     "ts-jest": "^25.2.1",
-    "typescript": "^3.8.2"
+    "typescript": "^3.9.2"
   },
   "jest": {
     "transform": {

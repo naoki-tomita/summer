@@ -61,13 +61,18 @@ class Test {
 
   @auth
   async auth(cookies: any) {
-    console.log(cookies);
+    console.log(cookies, "auth");
     return { name: cookies.user };
   }
 
   @path("/response")
   async setHeader() {
     return new Response().status(302).headers({ "set-cookie": "foo=bar" }).body({ hello: "world" });
+  }
+
+  @path("/auth")
+  async authResponse({ authResult }: Request) {
+    return new Response().status(200).body(authResult);
   }
 }
 
@@ -113,6 +118,7 @@ function polling() {
     for (let i = 0; i < 30; i++) {
       const result = await fetch(`http://localhost:${port}/ping`);
       if (result.ok && result.status === 200) {
+        console.log("Polling completed.");
         return ok();
       }
       await sleep(500);
@@ -202,6 +208,16 @@ const tests: Array<{
       "user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
     }
   },
+  // authResult test.
+  {
+    path: "/root/auth",
+    method: "get",
+    headers: { foo: "bar", cookie: "user=tomita" },
+    status: 200,
+    response: {
+      name: "tomita"
+    }
+  },
 ];
 
 function toQueryString(obj: any) {
@@ -262,5 +278,5 @@ describe("summer-framework test", () => {
       await result.json(),
       "Response body are not equal."
     );
-  })
+  });
 });

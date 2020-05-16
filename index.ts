@@ -1,5 +1,4 @@
-import express from "express";
-import parser from "cookie-parser";
+import { express } from "./Express";
 
 const app = express();
 
@@ -81,9 +80,7 @@ export interface Request<
 }
 
 let server: any;
-export function listen(port: number) {
-  app.use(express.json());
-  app.use(parser());
+export async function listen(port: number) {
   [...targetMap.entries()].forEach(([target, meta]) => {
     const { resources, root = "" } = meta;
     Object.keys(resources).forEach(key => {
@@ -123,11 +120,12 @@ export function listen(port: number) {
     });
   });
 
-  server = app.listen(port);
+  server = await app.listen(port);
+  debug(`Server started on port ${port}`)
 }
 
 export function close() {
-  (server as any).close();
+  server.close();
 }
 
 function logFormat(type: string, text: string) {
