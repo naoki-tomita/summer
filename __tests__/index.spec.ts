@@ -1,4 +1,4 @@
-import { path, root, get, listen, post, close, handle, auth, Response, Request } from "..";
+import { path, root, get, listen, post, close, handle, auth, Response, Request } from "../index";
 import fetch from "node-fetch";
 import { deepStrictEqual } from "assert";
 
