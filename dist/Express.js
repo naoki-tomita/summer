@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.express = void 0;
 const http_1 = require("http");
@@ -62,21 +71,16 @@ function getSimilarityUrl(defined, incoming) {
 function getParams(defined, incoming) {
     return zipMin(trimSlash(defined).split("/"), trimSlash(incoming).split("/"))
         .reduce((prev, { left, right }) => left.startsWith(":")
-        ? ({ ...prev, [left.slice(1)]: right })
+        ? (Object.assign(Object.assign({}, prev), { [left.slice(1)]: right }))
         : prev, {});
 }
 function wrapAsIncomingMessage(message, params, query, cookies, body) {
-    const dst = {
-        ...message,
-        params, query, cookies, body
-    };
+    const dst = Object.assign(Object.assign({}, message), { params, query, cookies, body });
     dst.__proto__ = message.__proto__;
     return dst;
 }
 function wrapAsServerResponse(response) {
-    const dst = {
-        ...response,
-        status(status) {
+    const dst = Object.assign(Object.assign({}, response), { status(status) {
             response.statusCode = status;
             return wrapAsServerResponse(response);
         },
@@ -88,8 +92,7 @@ function wrapAsServerResponse(response) {
             console.log(json);
             response.setHeader("content-type", "application/json");
             response.end(JSON.stringify(json));
-        }
-    };
+        } });
     dst.__proto__ = response.__proto__;
     return dst;
 }
@@ -98,20 +101,22 @@ function parseQuery(queryString) {
         .map(item => item.trim())
         .filter(item => item !== "")
         .map(item => item.split("="))
-        .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+        .reduce((prev, [key, value]) => (Object.assign(Object.assign({}, prev), { [key]: value })), {});
 }
-async function parseBody(req) {
-    let result = "";
-    return new Promise(ok => {
-        req.on("data", data => result = result + data.toString());
-        req.on("end", () => {
-            try {
-                ok(JSON.parse(result));
-            }
-            catch {
-                console.log(result);
-                ok(result);
-            }
+function parseBody(req) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let result = "";
+        return new Promise(ok => {
+            req.on("data", data => result = result + data.toString());
+            req.on("end", () => {
+                try {
+                    ok(JSON.parse(result));
+                }
+                catch (_a) {
+                    console.log(result);
+                    ok(result);
+                }
+            });
         });
     });
 }
@@ -121,36 +126,39 @@ function parseCookie(cookieString) {
         .map(item => item.trim())
         .filter(item => item !== "")
         .map(item => item.split("="))
-        .reduce((prev, [key = "", value = ""]) => ({ ...prev, [key]: value }), {});
+        .reduce((prev, [key = "", value = ""]) => (Object.assign(Object.assign({}, prev), { [key]: value })), {});
 }
 class App {
     constructor() {
         this.callbacks = [];
-        this.server = http_1.createServer(async (req, res) => {
+        this.server = http_1.createServer((req, res) => __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c, _d;
             try {
-                const url = req.url ?? "";
+                const url = (_a = req.url) !== null && _a !== void 0 ? _a : "";
                 const [path = "", queryString = ""] = url.split("?");
                 const founds = this.callbacks
-                    .filter(it => it.method === (req.method ?? "").toUpperCase())
+                    .filter(it => { var _a; return it.method === ((_a = req.method) !== null && _a !== void 0 ? _a : "").toUpperCase(); })
                     .filter(it => hasFitsUrl(it.path, path));
                 if (founds.length === 0) {
                     return res.writeHead(404).end();
                 }
                 let body = {};
-                if (req.method?.toUpperCase() === "POST" || req.method?.toUpperCase() === "PUT") {
-                    body = await parseBody(req);
+                if (((_b = req.method) === null || _b === void 0 ? void 0 : _b.toUpperCase()) === "POST" || ((_c = req.method) === null || _c === void 0 ? void 0 : _c.toUpperCase()) === "PUT") {
+                    body = yield parseBody(req);
                 }
                 const found = founds.sort((a, b) => getSimilarityUrl(b.path, path) - getSimilarityUrl(a.path, path))[0];
-                await found.handler(wrapAsIncomingMessage(req, getParams(found.path, path), parseQuery(queryString), parseCookie(req.headers.cookie ?? ""), body), wrapAsServerResponse(res));
+                yield found.handler(wrapAsIncomingMessage(req, getParams(found.path, path), parseQuery(queryString), parseCookie((_d = req.headers.cookie) !== null && _d !== void 0 ? _d : ""), body), wrapAsServerResponse(res));
             }
             catch (e) {
                 console.error(e.stack);
                 return res.writeHead(500).end(e.stack);
             }
-        });
+        }));
     }
-    async listen(port) {
-        return new Promise(ok => this.server.listen(port, () => ok(this)));
+    listen(port) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise(ok => this.server.listen(port, () => ok(this)));
+        });
     }
     use(method, path, handler) {
         this.callbacks.push({
