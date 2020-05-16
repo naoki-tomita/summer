@@ -8,7 +8,7 @@ A web framework like spring framework.
 # how to use
 
 ```ts
-import { listen, get, path, post, root, handle } from "summer-framework";
+import { listen, get, path, post, root, handle, Request, Response } from "summer-framework";
 
 @root("/root")
 class FooBarResource {
@@ -23,21 +23,21 @@ class FooBarResource {
   // params -> { param: "bar" }, query -> { query: "string" }
   @path("/foo/:param")
   @get
-  async fooParam(params: { param: string }, query: { query: string }) {
-    return await someAsyncFunction();
+  async fooParam({ params, query }: Request) {
+    return new Response(200).body(await someAsyncFunction());
   }
 
   // /root/bar
   // body -> requestBody
   @post
   @path("/bar")
-  async barPost(params: {}, query: {}, body: { some: string, parameter: string }) {
-    return body;
+  async barPost({ body }: Request) {
+    return new Response().status(200).body({ ...body });
   }
 
   @handle(MyException)
-  async handleMyException(error: MyException): { status: number, body: any } {
-    return { status: 404, body: { error: "this is my exception." } }
+  async handleMyException(error: MyException): Response {
+    return new Response().status(404).header({ foo: "bar" }).body({ error: "message" });
   }
 }
 
