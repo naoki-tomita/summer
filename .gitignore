@@ -1,4 +1,2 @@
-node_modules
-index.d.ts
-index.js
-index.d.ts.map
+node_modules/
+dist/
