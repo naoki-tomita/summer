@@ -61,7 +61,6 @@ class Test {
 
   @auth
   async auth(cookies: any) {
-    console.log(cookies, "auth");
     return { name: cookies.user };
   }
 
@@ -99,13 +98,11 @@ class MyError2 implements Error {
 class ErrorHandler {
   @handle(MyError)
   handler(error: MyError) {
-    console.log(error);
     return { status: 400, body: { hello: "world" } };
   }
 
   @handle(MyError2)
   handler2(error: MyError2) {
-    console.log(error);
     return new Response().status(403).headers({ foo: "bar" }).body({ error: "error" });
   }
 }
@@ -118,7 +115,6 @@ function polling() {
     for (let i = 0; i < 30; i++) {
       const result = await fetch(`http://localhost:${port}/ping`);
       if (result.ok && result.status === 200) {
-        console.log("Polling completed.");
         return ok();
       }
       await sleep(500);

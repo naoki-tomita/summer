@@ -74,7 +74,6 @@ function getSimilarityUrl(defined: string, incoming: string): number {
       }
       return prev;
     }, 0);
-  console.log(defined, r);
   return r
 }
 
@@ -109,7 +108,6 @@ function wrapAsServerResponse(response: RawServerResponse): ServerResponse {
       return wrapAsServerResponse(response);
     },
     json(json: any) {
-      console.log(json);
       response.setHeader("content-type", "application/json");
       response.end(JSON.stringify(json));
     }
@@ -134,7 +132,7 @@ async function parseBody(req: RawIncomingMessage): Promise<any> {
       try {
         ok(JSON.parse(result));
       } catch {
-        console.log(result);
+        console.error(`Failed to parse body by json. This framework expect json body.: ${result}`);
         ok(result);
       }
     });
