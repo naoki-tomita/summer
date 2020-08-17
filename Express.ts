@@ -139,8 +139,6 @@ async function parseBody(req: RawIncomingMessage): Promise<any> {
   });
 }
 
-"cookie: ANID=OPT_OUT; OTZ=5441785_20_20__20_; SID=xAfsG8CUYGo13vAS1xFvJNIHvpR1wXI8ZV9XEcnmNJgdD7j9UsC301ctrzro5bZ_94F1fg.; __Secure-3PSID=xAfsG8CUYGo13vAS1xFvJNIHvpR1wXI8ZV9XEcnmNJgdD7j9In3cQeasQ8a_YvKeGW-NGw.; HSID=AFYtuWZelr8tplf9-; SSID=AtCWTcibHNB1i51_9; APISID=dwxZSweQYDzibPaV/Aww3tpnS9u0GYENbz; SAPISID=108_4JPwFCtDf8v9/A-oSu2SJAZJbnm9s1; __Secure-HSID=AFYtuWZelr8tplf9-; __Secure-SSID=AtCWTcibHNB1i51_9; __Secure-APISID=dwxZSweQYDzibPaV/Aww3tpnS9u0GYENbz; __Secure-3PAPISID=108_4JPwFCtDf8v9/A-oSu2SJAZJbnm9s1; NID=204=HNoUpp5LPrakkaO0864b1Gm_JazMWtxfccZqohBOrjk_i41RLgLpGxGfzDSl-qzLiMJRR7w6D5EgX7N50LdCEhSlC5n7mAVrdxVYFvOaYc4jUkhqABaU69nbbBCnx_aeCPVFJ894hY8U3bh1C5BnwKdqpk_1mYGN-P9Exc9xFVsOI0QQdMOg9x_vteDQO7brVny6IInTPBscr49TQqLSsDp6zEwL3r6bi8kwPq7bNzCYnaghvS5xzuSX68MronMYXqLyk3e4jTCtTDUGQ6ZtY9FQ9kns4iIvAkhjuyQmHcwAVDyOgWazNmOy3ZuF01y9nkR3rXJVenFIiLc94WgoCLXVKwf4gkExdyfVgJxjoa8t6ZaTww; 1P_JAR=2020-05-15-23; SIDCC=AJi4QfHpQEgNC1eNPqANUNjeJxQW888u1HJH2-uc9IYtBrRKXYXbNp-2ziArzpzQ5o5aXesz-24"
-
 function parseCookie(cookieString: string) {
   return cookieString.split(";")
     .map(item => item.trim())
