@@ -9,7 +9,7 @@ const targetMap = new Map<
     root: string;
     resources: {
       [key: string]: {
-        method: "get" | "post" | "put";
+        method: "get" | "post" | "put" | string;
         path: string;
       };
     };
@@ -87,7 +87,7 @@ export async function listen(port: number) {
       const { method = "get", path } = resources[key];
       const fullPath = root + path;
       debug(`${fullPath}: ${method.toUpperCase()}`);
-      app[method](fullPath, async (req, res) => {
+      app.use(method, fullPath, async (req, res) => {
         const { params, body, query, headers, cookies } = req;
         debug(`${req.url}`);
         try {

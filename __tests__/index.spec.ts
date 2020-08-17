@@ -1,4 +1,4 @@
-import { path, root, get, listen, post, close, handle, auth, Response, Request } from "../index";
+import { path, root, get, listen, post, close, handle, auth, Response, Request, customMethod } from "../index";
 import fetch from "node-fetch";
 import { deepStrictEqual } from "assert";
 
@@ -73,6 +73,12 @@ class Test {
   async authResponse({ authResult }: Request) {
     return new Response().status(200).body(authResult);
   }
+
+  @customMethod("delete")
+  @path("/delete")
+  async delete() {
+    return new Response().status(200).body({});
+  }
 }
 
 class System {
@@ -124,7 +130,7 @@ function polling() {
 
 const tests: Array<{
   path: string;
-  method: "get" | "post" | "put";
+  method: "get" | "post" | "put" | "delete";
   body?: any;
   query?: any;
   headers?: any;
@@ -214,6 +220,13 @@ const tests: Array<{
       name: "tomita"
     }
   },
+  // delete method.
+  {
+    path: "/root/delete",
+    method: "delete",
+    status: 200,
+    response: {},
+  }
 ];
 
 function toQueryString(obj: any) {
